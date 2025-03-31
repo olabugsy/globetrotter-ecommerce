@@ -2,8 +2,8 @@ package com.globtrotter.security;
 
 import com.globtrotter.model.User;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,13 +17,12 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public User getUser() {
-        return this.user;
+        return user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // ✅ Fix: Prefix with "ROLE_" to match Spring Security expectations
-        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName().toUpperCase()));
     }
 
     @Override

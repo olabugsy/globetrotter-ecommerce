@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class RegistrationService {
@@ -32,21 +32,22 @@ public class RegistrationService {
             return "❌ Email already in use";
         }
 
-        Optional<Role> customerRoleOpt = roleRepository.findByName("CUSTOMER");
-        if (customerRoleOpt.isEmpty()) {
-            return "❌ 'CUSTOMER' role not found";
-        }
-
-        Role customerRole = customerRoleOpt.get();
+        Role role = roleRepository.findByName(request.getRole())
+                .orElseThrow(() -> new RuntimeException("❌ Role not found: " + request.getRole()));
 
         User user = new User();
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(customerRole);
+        user.setRole(role);
 
         userRepository.save(user);
+        System.out.println("✅ Registration successful for email: " + request.getEmail() + ", role: " + request.getRole());
         return "✅ Registration successful";
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
@@ -21,25 +20,15 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/register",
-                                "/auth/login",
-                                "/public/**",
-                                "/products/**"
-                        ).permitAll()
-                        .requestMatchers("/products/admin/**")
-                        .hasAnyRole("ADMIN", "VENDOR")  // Ensure both "ROLE_ADMIN" and "ROLE_VENDOR" can access
-                        .requestMatchers("/cart/**")
-                        .hasRole("CUSTOMER")  // Ensure access to cart is restricted to "ROLE_CUSTOMER"
-                        .requestMatchers("/admin/**")
-                        .hasRole("ADMIN")  // Ensure only "ROLE_ADMIN" can access
-                        .requestMatchers("/vendor/**")
-                        .hasRole("VENDOR")  // Ensure only "ROLE_VENDOR" can access
-                        .requestMatchers("/customer/**")
-                        .hasRole("CUSTOMER")  // Ensure only "ROLE_CUSTOMER" can access
+                        .requestMatchers("/auth/register", "/auth/login", "/public/**", "/products/**").permitAll()
+                        .requestMatchers("/products/admin/**").hasAnyRole("ADMIN", "VENDOR")
+                        .requestMatchers("/cart/**").hasRole("CUSTOMER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // <-- Updated line
+                        .requestMatchers("/vendor/**").hasRole("VENDOR")
+                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
-                .httpBasic(httpBasic -> {}); // Basic Auth enabled
+                .httpBasic(httpBasic -> {});
 
         return http.build();
     }
